@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_neat_and_clean_calendar/flutter_neat_and_clean_calendar.dart';
+import 'package:flutter_clean_calendar/flutter_clean_calendar.dart';
 
 void main() => runApp(MyApp());
 
@@ -14,8 +14,6 @@ class MyApp extends StatelessWidget {
 }
 
 class DemoApp extends StatefulWidget {
-  const DemoApp({Key? key}) : super(key: key);
-
   @override
   _DemoAppState createState() => _DemoAppState();
 }
@@ -23,17 +21,32 @@ class DemoApp extends StatefulWidget {
 class _DemoAppState extends State<DemoApp> {
   late DateTime selectedDay;
   late List selectedEvent;
-  final Map<DateTime, List> events = {
-    DateTime(2020, 12, 12): [
-      {'Name': 'Your event name', 'is Done': true},
-      {'Name': 'Your event name 2', 'is Done': true},
-      {'Name': 'Your event name 3', 'is Done': false},
+
+  final Map<DateTime, List<CleanCalendarEvent>> events = {
+    DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day): [
+      CleanCalendarEvent('Event A',
+          startTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day, 10, 0),
+          endTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day, 12, 0),
+          description: 'A special event',
+          color: Colors.blue[700]!),
     ],
-    DateTime(2020, 12, 2): [
-      {'Name': 'Your event name', 'is Done': false},
-      {'Name': 'Your event name 2', 'is Done': true},
-      {'Name': 'Your event name 3', 'is Done': false},
-    ]
+    DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day + 2):
+        [
+      CleanCalendarEvent('Event B',
+          startTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 2, 10, 0),
+          endTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 2, 12, 0),
+          color: Colors.orange),
+      CleanCalendarEvent('Event C',
+          startTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 2, 14, 30),
+          endTime: DateTime(DateTime.now().year, DateTime.now().month,
+              DateTime.now().day + 2, 17, 0),
+          color: Colors.pink),
+    ],
   };
 
   void _handleData(date) {
@@ -44,24 +57,36 @@ class _DemoAppState extends State<DemoApp> {
   }
 
   @override
+  void initState() {
+    _handleData(DateTime(
+        DateTime.now().year, DateTime.now().month, DateTime.now().day));
+    selectedEvent = events[selectedDay] ?? [];
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Calendar'),
+        title: Text('Calender'),
         centerTitle: true,
       ),
       body: SafeArea(
         child: Container(
           child: Calendar(
             startOnMonday: true,
-            selectedColor: Colors.black,
-            todayColor: Colors.amber,
+            selectedColor: Colors.blue,
+            todayColor: Colors.red,
             eventColor: Colors.green,
             eventDoneColor: Colors.amber,
-            bottomBarColor: Colors.green,
+            bottomBarColor: Colors.deepOrange,
             onRangeSelected: (range) {
-              print('Selected Day ${range.from},${range.to}');
+              print('Selected Day ${range.from}, ${range.to}');
             },
+            onDateSelected: (date) {
+              return _handleData(date);
+            },
+            events: events,
             isExpanded: true,
             dayOfWeekStyle: TextStyle(
               fontSize: 13,
@@ -69,10 +94,12 @@ class _DemoAppState extends State<DemoApp> {
               fontWeight: FontWeight.w900,
             ),
             bottomBarTextStyle: TextStyle(
-              color: Color.fromARGB(255, 255, 197, 7),
+              color: Colors.white,
             ),
+            hideBottomBar: false,
+            isExpandable: true,
             hideArrows: false,
-            weekDays: ['Mon', 'Tue', 'Wed', 'Thurs', 'Fri', 'Sat', 'Sun'],
+            weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
           ),
         ),
       ),
